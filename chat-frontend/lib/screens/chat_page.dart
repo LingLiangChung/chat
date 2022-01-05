@@ -104,7 +104,7 @@ class _ChatPageState extends State<ChatPage> {
                       shrinkWrap: true,
                       itemCount: snapshot.data!.length,
                       itemBuilder: (context, index){
-                        return ConversationList(username: snapshot.data![index].name!, email: snapshot.data![index].email!,);
+                        return ConversationList(userID: snapshot.data![index].id!, username: snapshot.data![index].name!, email: snapshot.data![index].email!,);
                       },
                     );
                   }else{

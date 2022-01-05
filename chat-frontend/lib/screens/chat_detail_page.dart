@@ -1,13 +1,24 @@
+import 'package:chat/controllers/chatController.dart';
 import 'package:flutter/material.dart';
 
 class ChatDetailPage extends StatefulWidget {
-  const ChatDetailPage({Key? key}) : super(key: key);
+
+  final int receiverUserID;
+
+  const ChatDetailPage({Key? key, required this.receiverUserID}) : super(key: key);
 
   @override
-  _ChatDetailPageState createState() => _ChatDetailPageState();
+  _ChatDetailPageState createState() => _ChatDetailPageState(receiverUserID);
 }
 
 class _ChatDetailPageState extends State<ChatDetailPage> {
+
+  final int receiverUserID;
+
+  _ChatDetailPageState(this.receiverUserID);
+
+  TextEditingController textMessageController = TextEditingController();
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -100,6 +111,7 @@ class _ChatDetailPageState extends State<ChatDetailPage> {
                   SizedBox(width: 15,),
                   Expanded(
                     child: TextField(
+                      controller: textMessageController,
                       decoration: InputDecoration(
                           hintText: "Write message...",
                           hintStyle: TextStyle(color: Colors.black54),
@@ -109,7 +121,9 @@ class _ChatDetailPageState extends State<ChatDetailPage> {
                   ),
                   SizedBox(width: 15,),
                   FloatingActionButton(
-                    onPressed: (){},
+                    onPressed: (){
+                      sendMessage(receiverUserID, textMessageController.text);
+                    },
                     child: Icon(Icons.send,color: Colors.white,size: 18,),
                     backgroundColor: Colors.blue,
                     elevation: 0,

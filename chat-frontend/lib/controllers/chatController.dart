@@ -26,3 +26,38 @@ Future<List<User>> getAllUser() async {
     return userList;
   }
 }
+
+void sendMessage(int receiverUserID, String textMessage) async {
+  String stringUrl = "http://192.168.0.181:8000/api/chat/sendMessage";
+  Uri url = Uri.parse(stringUrl);
+  var response = await http.post(
+    url,
+    body: {
+      'senderUserID' : 1.toString(), // to set current logged in user
+      'receiverUserID' : receiverUserID.toString(),
+      'chatMessage' : textMessage,
+    },
+    headers: {
+      'Accept' : 'application/json',
+    },
+  );
+
+  print(response.body);
+}
+
+void getChatUser(int receiverUserID) async {
+  String stringUrl = "http://192.168.0.181:8000/api/chat/getUserChat";
+  Uri url = Uri.parse(stringUrl);
+  var response = await http.post(
+    url,
+    body: {
+      'senderUserID' : 1.toString(), // to set current logged in user
+      'receiverUserID' : receiverUserID.toString(),
+    },
+    headers: {
+      'Accept' : 'application/json',
+    },
+  );
+
+  print(response.body);
+}
