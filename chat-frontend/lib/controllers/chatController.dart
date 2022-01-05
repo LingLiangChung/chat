@@ -1,5 +1,6 @@
 import 'dart:convert';
 
+import 'package:chat/models/Chat.dart';
 import 'package:chat/models/User.dart';
 import 'package:http/http.dart' as http;
 
@@ -45,7 +46,7 @@ void sendMessage(int receiverUserID, String textMessage) async {
   print(response.body);
 }
 
-void getChatUser(int receiverUserID) async {
+Future<List<Chat>> getChatUser(int receiverUserID) async {
   String stringUrl = "http://192.168.0.181:8000/api/chat/getUserChat";
   Uri url = Uri.parse(stringUrl);
   var response = await http.post(
@@ -59,5 +60,13 @@ void getChatUser(int receiverUserID) async {
     },
   );
 
-  print(response.body);
+  List<Chat> chatList = [];
+  if(response.statusCode == 200){
+    var json = jsonDecode(response.body);
+    chatList = (json as List).map((e) => Chat.fromJson(e)).toList();
+
+    return chatList;
+  }else{
+    return chatList;
+  }
 }

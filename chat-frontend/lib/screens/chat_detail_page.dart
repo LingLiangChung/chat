@@ -1,4 +1,5 @@
 import 'package:chat/controllers/chatController.dart';
+import 'package:chat/models/Chat.dart';
 import 'package:flutter/material.dart';
 
 class ChatDetailPage extends StatefulWidget {
@@ -17,7 +18,23 @@ class _ChatDetailPageState extends State<ChatDetailPage> {
 
   _ChatDetailPageState(this.receiverUserID);
 
+  Future<List<Chat>>? futureChatList;
   TextEditingController textMessageController = TextEditingController();
+  int currentLoggedInUserID = 1;
+
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    getUserChatDetail();
+  }
+
+  Future getUserChatDetail() async {
+    List<Chat> chatList = await getChatUser(receiverUserID);
+    setState(() {
+      futureChatList = Future.value(chatList);
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -62,29 +79,24 @@ class _ChatDetailPageState extends State<ChatDetailPage> {
       ),
       body: Stack(
         children: <Widget>[
-          ListView.builder(
-            itemCount: 5,
-            shrinkWrap: true,
-            padding: EdgeInsets.only(top: 10,bottom: 10),
-            physics: NeverScrollableScrollPhysics(),
-            itemBuilder: (context, index){
-              return Container(
-                padding: EdgeInsets.only(left: 16,right: 16,top: 10,bottom: 10),
-                child: Align(
-                  // alignment: (messages[index].messageType == "receiver"?Alignment.topLeft:Alignment.topRight),
-                  alignment: Alignment.topLeft,
-                  child: Container(
-                    decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(20),
-                      // color: (messages[index].messageType  == "receiver"?Colors.grey.shade200:Colors.blue[200]),
-                      color: Colors.grey.shade200,
-                    ),
-                    padding: EdgeInsets.all(16),
-                    child: Text('Yooo',style: TextStyle(fontSize: 15),),
-                  ),
-                ),
-              );
-            },
+          FutureBuilder<List<Chat>>(
+            future: futureChatList,
+            builder: (context, snapshot) {
+              if(snapshot.hasData){
+                return ListView.builder(
+                  itemCount: snapshot.data!.length,
+                  shrinkWrap: true,
+                  padding: EdgeInsets.only(top: 10,bottom: 10),
+                  physics: NeverScrollableScrollPhysics(),
+                  itemBuilder: (context, index){
+                    bool isCurrentUser = snapshot.data![index].chatReceiverUserID != currentLoggedInUserID ? true : false;
+                    return ChatList(chat: snapshot.data![index], currentLogInUserID: currentLoggedInUserID);
+                  },
+                );
+              }else{
+                return Text('Loading...');
+              }
+            }
           ),
           Align(
             alignment: Alignment.bottomLeft,
@@ -123,6 +135,8 @@ class _ChatDetailPageState extends State<ChatDetailPage> {
                   FloatingActionButton(
                     onPressed: (){
                       sendMessage(receiverUserID, textMessageController.text);
+                      textMessageController.clear();
+                      getUserChatDetail();
                     },
                     child: Icon(Icons.send,color: Colors.white,size: 18,),
                     backgroundColor: Colors.blue,
@@ -138,3 +152,35 @@ class _ChatDetailPageState extends State<ChatDetailPage> {
     );
   }
 }
+
+class ChatList extends StatelessWidget {
+
+  final Chat chat;
+  final int currentLogInUserID;
+  const ChatList({Key? key, required this.chat, required this.currentLogInUserID}) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    bool isCurrentUser = chat.chatReceiverUserID != currentLogInUserID ? true : false;
+    return Container(
+      padding: EdgeInsets.only(left: 16,right: 16,top: 10,bottom: 10),
+      child: Align(
+        alignment: (!isCurrentUser ? Alignment.topLeft : Alignment.topRight),
+        child: Container(
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(20),
+            color: (!isCurrentUser ? Colors.grey.shade200:Colors.blue[200]),
+          ),
+          padding: EdgeInsets.all(16),
+          child: Text(
+            chat.chatMessage!,
+            style: TextStyle(
+                fontSize: 15
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+}
+
