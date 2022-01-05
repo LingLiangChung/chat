@@ -2,13 +2,23 @@ import 'package:chat/screens/chat_detail_page.dart';
 import 'package:flutter/material.dart';
 
 class ConversationList extends StatefulWidget {
-  const ConversationList({Key? key}) : super(key: key);
+
+  final String username;
+  final String email;
+
+  const ConversationList({Key? key, required this.username, required this.email}) : super(key: key);
 
   @override
-  _ConversationListState createState() => _ConversationListState();
+  _ConversationListState createState() => _ConversationListState(username, email);
 }
 
 class _ConversationListState extends State<ConversationList> {
+
+  final String username;
+  final String email;
+
+  _ConversationListState(this.username, this.email);
+
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
@@ -35,9 +45,21 @@ class _ConversationListState extends State<ConversationList> {
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            Text('Ling',style: TextStyle(fontSize: 16),),
+                            Text(
+                              username,
+                              style: TextStyle(
+                                  fontSize: 16
+                              ),
+                            ),
                             SizedBox(height: 6,),
-                            Text('Hello Bro',style: TextStyle(fontSize: 13,color: Colors.grey.shade600,fontWeight: FontWeight.bold),),
+                            Text(
+                              email, // used to be text message but I replace with user email
+                              style: TextStyle(
+                                  fontSize: 13,
+                                  color: Colors.grey.shade600,
+                                  fontWeight: FontWeight.bold
+                              ),
+                            ),
                           ],
                         ),
                       ),

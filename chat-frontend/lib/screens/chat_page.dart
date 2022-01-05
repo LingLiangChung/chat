@@ -1,3 +1,5 @@
+import 'package:chat/controllers/chatController.dart';
+import 'package:chat/models/User.dart';
 import 'package:chat/models/chat_users_model.dart';
 import 'package:chat/widgets/conversation_list.dart';
 import 'package:flutter/material.dart';
@@ -10,6 +12,23 @@ class ChatPage extends StatefulWidget {
 }
 
 class _ChatPageState extends State<ChatPage> {
+
+  Future<List<User>>? futureUserList;
+
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    getUser();
+  }
+
+  Future<void> getUser() async {
+    List<User> userList = await getAllUser();
+    setState(() {
+      futureUserList = Future.value(userList);
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -76,7 +95,23 @@ class _ChatPageState extends State<ChatPage> {
             ),
             Padding(
               padding: EdgeInsets.only(top: 16,left: 16,right: 16),
-              child: ConversationList(),
+              child: FutureBuilder<List<User>>(
+                future: futureUserList,
+                builder: (context, snapshot){
+                  if(snapshot.hasData){
+                    return ListView.builder(
+                      scrollDirection: Axis.vertical,
+                      shrinkWrap: true,
+                      itemCount: snapshot.data!.length,
+                      itemBuilder: (context, index){
+                        return ConversationList(username: snapshot.data![index].name!, email: snapshot.data![index].email!,);
+                      },
+                    );
+                  }else{
+                    return Text('Loading...');
+                  }
+                },
+              ),
             ),
           ],
         ),
